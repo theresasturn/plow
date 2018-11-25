@@ -1,0 +1,30 @@
+
+Combine coinciding (or) and disjoint (and)
+
+%a~[confidence-0.9,0.5,0.7].
+
+
+interesting(X):- high_trl,low_isd.
+%technology-document pairs 
+
+credible(0.98):- obama_epa
+credible(0.5):- russian_source
+
+------------------------------------
+
+Residuated lattices and implicatin
+
+@article{Oussalah:2003:UHT:871625.871630,
+ author = {Oussalah, Mourad},
+ title = {On the Use of Hamacher's T-norms Family for Information Aggregation},
+ journal = {Inf. Sci.},
+ issue_date = {July 2003},
+ volume = {153},
+ number = {1},
+ month = jul,
+ year = {2003},
+ pages = {107--154}
+} 
+
+
+
