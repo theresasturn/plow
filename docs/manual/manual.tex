@@ -1,0 +1,228 @@
+
+\documentclass[12pt]{article}
+%\documentclass[11pt]{report}
+
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage{epsf,epsfig,subfigure,latexsym,latexsym,xspace,amssymb}
+%%\usepackage{makeidx}
+%%\usepackage{index}
+\usepackage{imakeidx}
+\usepackage[colorlinks]{hyperref}
+\usepackage{url}
+\usepackage{alltt}
+\usepackage{epic}
+\usepackage{ecltree}
+\usepackage{longtable}
+\usepackage{graphicx}
+\usepackage{CJK}
+%\usepackage{pinyin}
+%\usepackage[utf8]{inputenc}
+
+\pagestyle{headings}
+
+% LaTeX Size Stuff
+% ----------------
+%\setlength{\topmargin}{-0.25in}
+\setlength{\headheight}{10pt}
+\setlength{\headsep}{30pt}
+\setlength{\oddsidemargin}{0.0in}
+\setlength{\evensidemargin}{0.0in}
+\setlength{\textheight}{8.0in}
+\setlength{\textwidth}{6.0in}
+\setlength{\footskip}{50pt}
+\setlength{\parskip}{2mm}               % space between paragraphs
+
+
+% New Environments
+% ----------------
+\newtheorem{example}{Example}[section]
+\newtheorem{exercise}{Exercise}[section]
+\newtheorem{proposition}{Proposition}[section]
+
+\newcommand{\fillBox}{\hfill$\Box$}
+
+\newcommand{\mt}[1]{#1}
+% use this command if you dont want to see the MT stuff.
+%\newcommand{\mt}[1]{}
+
+
+\newenvironment{Prog}{\begin{tt}\begin{tabular}[c]{l}}{\end{tabular}\end{tt}}
+
+\newcommand{\compatibility}{{\bf ISO Compatibility Note:\ }}
+\newcommand{\portability}{{\bf Portability Note:\ }}
+\newcommand{\demo}[1]{\hspace*{1.5cm}{\tt #1}}
+\newcommand{\desc}[1]{\item[{\tt #1}]\hspace*{1mm}\newline}
+\newcommand{\desce}[1]{\item[{\tt #1}]}
+\newcommand{\dashdashgreater}{{-\hspace{0.1pt}-\hspace{0.1pt}>\ }}
+
+\newcommand{\stdrefindex}[1]{\index{\texttt{#1}} \index[pred]{\texttt{#1}}}
+\newcommand{\predrefindex}[1]{\index{\texttt{#1}}}
+\newcommand{\ourtool}{{FPLP\ }}
+
+% use isoitem for standard predicates that are iso
+\newcommand{\isoitem}[2]{\item[{\mbox{\tt #1}}] \index[pred]{\texttt{#2}} \index{\texttt{#2}} \hspace*{\fill}{\mbox{\sf ISO}}\ \\}
+\newcommand{\isorepeatitem}[2]{\item[{\mbox{\tt #1}}] \index[pred]{\texttt{#2}} \index{\texttt{#2}} \hspace*{\fill}{\mbox{\sf ISO}}\ \\ \vspace*{-.25in}}
+
+% use (repeat) standard item for standard predicates that are not ISO, and don't have any special category
+\newcommand{\standarditem}[2]{\item[{\mbox{\tt #1}}] \index[pred]{\texttt{#2}} \index{\texttt{#2}}\ \\}
+\newcommand{\repeatstandarditem}[2]{\item[{\mbox{\tt #1}}] \index[pred]{\texttt{#2}} \index{\texttt{#2}}\ \\ \vspace*{-.25in}}
+
+% use (repeat) standard item for standard predicates that are not ISO, and do have a special category
+\newcommand{\ourstandarditem}[3]{\item[{\mbox{\tt #1}}  ] \index[pred]{\texttt{#2}} \index{\texttt{#2}} \hspace*{\fill}{\mbox{\sf #3}}\ \\}
+\newcommand{\ourrepeatstandarditem}[3]{\item[{\mbox{\tt #1}}] \index[pred]{\texttt{#2}} \index{\texttt{#2}} \hspace*{\fill}{\mbox{\sf #3}}\ \\ \vspace*{-.25in}}
+
+% Use for non-standard predicates
+\newcommand{\ourmoditem}[3]{\item[{\mbox{\tt #1}}] \index{\texttt{#2}}\hspace*{\fill}{\mbox{\sf module:} {\tt #3}}\ \\}
+\newcommand{\ourrepeatmoditem}[3]{\item[{\mbox{\tt #1}}]\index{\texttt{#2}}\hspace*{\fill}{\mbox{\sf module:} {\tt #3}}\ \\ \vspace*{-.35in}}
+
+% Use for C predicates
+\newcommand{\ourCitem}[2]{\item[{\mbox{\tt #1}}]\index{\texttt{#2}{\texttt{()}}}\hspace*{\fill}{\mbox{\it C function}}\ \\}
+
+%\newcommand{\maxans}{answer set cardinality}
+%\newcommand{\Maxans}{Answer set cardinality}
+%\newcommand{\MAXANS}{Answer Set Cardinality}
+
+\newcommand{\maxans}{answer count}
+\newcommand{\Maxans}{Answer count}
+\newcommand{\MAXANS}{Answer Count}
+\newcommand{\maxUans}{answer\_count}
+
+% Use to refer to predicates in main index.  If you index directly,
+% the latex mangling of commands will make the index inconsistent.
+\newcommand{\predref}[1]{\index{\texttt{#1}}}
+
+%%%%%%%%%%%%% OBSOLETE SPECIAL CASES %%%%%%%%%%%%%%%%%%
+% Only used in one case in foreign -- could be disposed of.
+\newcommand{\ouritem}[1]{\item[{\mbox{\tt #1}}] \ \\}
+\newcommand{\ourrepeatitem}[1]{\item[{\mbox{\tt #1}}]\ \\ \vspace*{-.35in}}
+
+% Only used for special cases like \+.  Maybe we could get rid of it
+% with some fiddling.
+\newcommand{\ournewrepeatitem}[2]{\item[{\mbox{\tt #1}}]\hspace*{\fill}{\mbox{\sf #2}}\ \\ \vspace*{-.35in}}
+\newcommand{\ournewitem}[2]{\item[{\mbox{\tt #1}}]\hspace*{\fill}{\mbox{\sf #2}}\ \\}
+
+\newcommand{\ourisousageitem}[2]{\item[{\mbox{\tt #1}}] \index[pred]{\texttt{#2}} \index{\texttt{#2}} \hspace*{\fill}{\mbox{\sf ISO}}\ \\ \vspace*{-.25in}}
+\newcommand{\ourusage}[1]{\begin{itemize} 
+	                               \item {\bf Usage:} {\tt #1} 
+	                               \end{itemize}}
+% used for manual2 -> manual1
+%\newcommand{\ouroldmoditem}[2]{\item[{\mbox{\tt #1}}]\hspace*{\fill}{\mbox{\tt module: #2}}\ \\}
+%\newcommand{\altourmoditem}[3]{\item[{\mbox{\tt #1}}] \index{\texttt{#2}}\hspace*{\fill}{\mbox{\sf module:} {\tt #3}}\ \\}
+
+%\newcommand{\ournewmoditem}[2]{\item[{\mbox{\tt #1}}]\hspace*{\fill}{\sf #2}
+%                   {\mbox{\sf module: }{\tt #2}}\ \\}
+
+%\newcommand{\ourusageitem}[1]{\item[{\mbox{\tt #1}}]\ \\ \vspace*{-.25in}}
+
+\newcommand{\stuff}[1]{
+        \begin{minipage}{4in}
+        {\tt \samepage
+        \begin{tabbing}
+        \hspace{8mm} \= \hspace{6mm} \= \hspace{10mm} \= \hspace{55mm} \= \kill
+        #1 \hfill
+        \end{tabbing}
+        }
+        \end{minipage}
+}
+
+
+% Macro Abbrev
+% ------------
+\def\cut{\mbox{\tt '!'/0}}
+\def\not{\mbox{${\tt '\backslash+'\!/1}$}}
+
+\newcommand{\comment}[1]{}
+\newcommand{\ourprolog}{XSB}
+\newcommand{\smallourprolog}{xsb}
+\newcommand{\version}{Version 3.8}
+\newcommand{\LRD}{LRD-stratified}
+
+\newcommand{\longline}{\noindent\rule{\textwidth}{.01in}}
+
+\newcommand{\localsched}{Local Scheduling}
+\newcommand{\Localsched}{Local Scheduling}
+\newcommand{\LocalSched}{Local Scheduling}
+
+\newcommand{\bi}{\begin{itemize}}
+\newcommand{\ei}{\end{itemize}}
+
+\newcommand{\refchap}[1]{Chapter~\ref{#1}}
+\newcommand{\refsec}[1]{Section~\ref{#1}}
+\newcommand{\refexam}[1]{Example~\ref{#1}}
+\newcommand{\refexer}[1]{Exercise~\ref{#1}}
+
+
+% Special Type Faces
+% ------------------
+\newcommand{\code}[1]{\textup{\texttt{#1}}}	% program code fragment
+\newcommand{\cA}{{\cal A}}
+\newcommand{\cG}{{\cal G}}
+\newcommand{\cO}{{\cal O}}
+\newcommand{\cS}{{\cal S}}
+\newcommand{\cT}{{\cal T}}
+
+\newcommand{\mif}{\mbox{ :- }}
+
+
+% conditional pdf output stuff
+% ----------------------------
+%\newif\ifpdf
+%\ifx\pdfoutput\undefined
+%   \pdffalse
+%\else
+%   \pdfoutput=1
+%   \pdftrue
+%\fi
+%
+%\ifpdf
+%    \newcommand{\xsblogo}{\epsfbox{xsb-logo.pdf}}
+%\else
+    %%\newcommand{\xsblogo}{\epsfbox{xsb-logo}}
+%    \newcommand{\xsblogo}{{xsb-logo}}
+%\fi
+
+%\DeclareUnicodeCharacter{12399}{\chinese1}
+
+%------------------------------------------------------------
+%\input{predindex.sty}
+%\makepredindex
+%\makeindex
+%\makeindex[name=pred,title=Index of Standard XSB Predicates]
+%%\newindex{pred}{prdx}{pnd}{Index of Predicates Standard in XSB}
+% to make the predicate index 	makeindex manual1.prdx -o manual1.pnd
+%------------------------------------------------------------
+
+\title{\bf FPLP: A Meta-Interpreter for Fuzzy (Probabilistic) Logic Programming}
+
+\author{}
+
+\begin{document}
+
+\thispagestyle{empty}
+\maketitle
+
+%\thispagestyle{empty}
+\pagenumbering{roman}
+
+%\newpage
+%\tableofcontents
+\newpage        % Just to avoid a silly LaTeX bug with \pagenumbering
+  
+\pagenumbering{arabic}
+
+\input{intro}
+\bibliographystyle{abbrv}
+\bibliography{longstring,manual}
+%
+%%\printindex
+%\printindex[pred]
+
+\end{document}
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% End: 
+
