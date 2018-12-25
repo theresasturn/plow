@@ -1,4 +1,4 @@
-%%% Todo %%%
+%% Todo %%%
 %% Continuous Variables (Belle, Edinburgh)
 %% Correlation between 0 and 1 for tnorms 
 %% Get some good examples of independent
@@ -42,30 +42,36 @@ para_t(A~M):- !,
 	      para_t_1(A,M)
 	    ; para_t_1(A,M1),
 	      % meet(M,M1,M) (wont work due to Prolog problems)
-	      M1 >= M). 
+	      gte(M1,M)).
 
 :- table para_t_1(_,lattice(join(X,Y,Z))).
 para_t_1(A,M):- 
 	  if(A,B),
 	  get_rule_weight(B,Body,Weight),
           meta_debug(calling(if(A,Body))),
-	  para_t(Body,1,M_b),
+          get_top(Top),
+	  para_t(Body,Top,M_b),
 	  apply_rule_weight(Weight,M_b,M_1),
-	  get_complement(A~1,Compl,_M_c),
+	  get_complement(A~Top,Compl,_M_c),
 	  (  meta_t(Compl~M_c),
-	     (1-M_c < M_1 -> M is 1-M_c ; M = M_1),M > 0
+	     measure_complement(M_c,M_new),
+	     ( lt(M_new,M_1) -> M = M_new ; M = M_1),gt_bottom(M)
+%	     (1-M_c < M_1 -> M is 1-M_c ; M = M_1),M > 0
 	   ; 
 	     sk_not(meta_t(Compl~_)),M = M_1),
           meta_debug(succeeded(if(A,Body,M))).
 para_t_1(A,M):- 
         meta_debug(calling(para_t_1(A,M))),
 	A~M_fact,
-	   get_complement(A~1,Compl,_M_c),
+           get_top(Top),
+	   get_complement(A~Top,Compl,_M_c),
 	(  meta_t(Compl~M_c),
-	   (1-M_c < M_fact -> M is 1-M_c ; M_fact = M)
+	   get_complement(Compl~M_c,_,M_c_c),
+	   (lt(M_c_c,M_fact) -> M is M_c_c ; M_fact = M)
+%	   (1-M_c < M_fact -> M is 1-M_c ; M_fact = M)
          ; 
 	   sk_not(meta_t(Compl~_)),M_fact = M),
-        meta_debug(succeeded(meta_1_t(A,M))).
+      meta_debug(succeeded(para_1_t(A,M))).
 
 para_t(','(A,B),M_in,M_out):- !,
 	meta_debug(calling(para_t3(A,M_in))),
@@ -76,7 +82,7 @@ para_t(','(A,B),M_in,M_out):- !,
 para_t(naf(A~M),M_in,M_in):- !,
 	meta_debug(calling(para_t3(A,M_in))),
         sk_not(para_t(A~M)).
-para_t((A;B),M_in,M_out):- !,
+para_t((_A;_B),_M_in,_M_out):- !,
       abort('Disjunction not allowed within the body of a quantified rule.').
 para_t(A,M_in,M_out):- 
         (is_quant(A,CallTerm) -> 
@@ -99,14 +105,18 @@ meta_t(A~M):- !,
 	      meta_1_t(A,M)
 	    ; meta_1_t(A,M1),
 	      % meet(M,M1,M) (wont work due to Prolog problems)
-	      M1 >= M). 
+%	      M1 >= M). 
+	      gte(M1,M)),
+	    meta_debug(succeeded(meta_t(A~M))).
+
 
 :- table meta_1_t(_,lattice(join(X,Y,Z))).
 meta_1_t(A,M):- 
 	  if(A,B),
 	  get_rule_weight(B,Body,Weight),
           meta_debug(calling(if(A,Body))),
-	  meta_t(Body,1,M_b),
+          get_top(Top),
+	  meta_t(Body,Top,M_b),
           meta_debug(succeeded(if(A,Body,M_b))),
 	  apply_rule_weight(Weight,M_b,M).
 meta_1_t(A,M):- 
@@ -148,14 +158,15 @@ meta_tu(A~M):- !,
 	      meta_1_tu(A,M)
 	    ; meta_1_tu(A,M1),
 	      % meet(M,M1,M) (wont work due to Prolog problems)
-	      M1 >= M). 
+	      gte(M1,M)). 
 
 :- table meta_1_tu(_,lattice(join(X,Y,Z))).
 meta_1_tu(A,M):- 
 	  if(A,B),
 	  get_rule_weight(B,Body,Weight),
           meta_debug(calling(if(A,Body))),
-	  meta_tu(Body,1,M_b),
+          get_top(Top),
+	  meta_tu(Body,Top,M_b),
           meta_debug(succeeded(if(A,Body,M_b))),
 	  apply_rule_weight(Weight,M_b,M),
 	  get_complement(A~M,Compl,M_c),
@@ -192,18 +203,26 @@ meta_tu(A,M_in,M_out):-
 	 ; call(A),get_top(M_mid)),
 	meet(M_in,M_mid,M_out).
 	
-call_t_complement(A~_M,M_c):- 
-   get_complement(A~1,Compl,_M_c),
-   (meta_1_t(Compl,_),fail ; true),
-   get_residual(meta_1_t(Compl,M_c),[]).
-call_t_complement(A,0):- 
-   get_complement(A~1,Compl,_M_c),
-   \+ get_residual(meta_1_t(Compl,_),[]).
-
 %-------------------------------------------------------
 
-get_complement(neg(A)~M,A,M_c):-!,M_c is 1 - M.
-get_complement(A~M,neg(A),M_c):-!,M_c is 1 - M.
+get_complement(Lit,CompLit,M):- 
+      (current_tnorm(minmax) -> 
+         get_minmax_complement(Lit,CompLit,M)
+       ; get_nonstruct_complement(Lit,CompLit,M)).
+
+get_nonstruct_complement(neg(A)~M,A,M_c):-!,M_c is 1 - M.
+get_nonstruct_complement(A~M,neg(A),M_c):-!,M_c is 1 - M.
+
+get_minmax_complement(neg(A)~[Min,Max],A,[Min_c,Max_c]):-!,Min_c is 1 - Max,Max_c is 1 - Min.
+get_minmax_complement(A~[Min,Max],neg(A),[Min_c,Max_c]):-!,Min_c is 1 - Max,Max_c is 1 - Min.
+
+measure_complement(M,M_c):- 
+      (current_tnorm(minmax) -> 
+         minmax_measure_complement(M,M_c)
+       ; nonstruct_measure_complement(M,M_c)).
+
+minmax_measure_complement([Min,Max],[Min_c,Max_c]):-!,Min_c is 1 - Max,Max_c is 1 - Min.
+nonstruct_measure_complement(M,M_c):- M_c is 1-M.
 
 get_complement(neg(A),A):-!.
 get_complement(A,neg(A)):-!.
@@ -221,20 +240,45 @@ apply_rule_weight(logistic,M_b,M):- M is 1 / (1 + e**(-(12*M_b-6))).
 get_rule_weight(\(Body,Weight),Body,Weight):- !.
 get_rule_weight(Body,Body,none).
 
-get_top(1).
+get_top(Top):- 
+    current_tnorm(minmax) -> Top = [1,1] ; Top = 1.
+
+get_bottom(Bottom):- 
+    current_tnorm(minmax) -> Bottom = [0,0] ; Bottom = 0.
+
+gt_bottom(M):- 
+    current_tnorm(minmax) -> get_bottom(Bot),gt(M,Bot) ; M > 0.
 
 /* Independent works, but it assumes exclusivity of derivations, so its tricky to use */
 
 meet(A,B,C):- 
      (current_tnorm(fuzzy) -> (A > B -> C=B ; C=A)
      ; current_tnorm(independent) -> (C is A * B)
-     ; current_tnorm(disjoint) -> ((0 > A + B - 1) -> C = 0 ; C is A+B-1)).
-%     ; current_tnorm(disjoint) -> ((0 > A + B - 1) -> C = 0 ; C is A+B-1)).
+     ; current_tnorm(disjoint) -> ((0 > A + B - 1) -> C = 0 ; C is A+B-1)
+     ; current_tnorm(minmax) -> minmax_meet(A,B,C)).
+
+minmax_meet([MinA,MaxA],[MinB,MaxB],[MinC,MaxC]):- 
+    ((0 > MinA + MinB - 1) -> MinC = 0 ; MinC is MinA+MinB-1),
+    (MaxA > MaxB -> MaxC=MaxB ; MaxC=MaxA).
+
 
 join(A,B,C):- 
      (current_tnorm(fuzzy) -> (A > B -> C=A ; C=B)
      ; current_tnorm(independent) -> C is 1 - ( (1-A) * (1 - B))
-     ; current_tnorm(disjoint) -> ((A + B > 1) -> C = 1 ; C is A + B)).
+     ; current_tnorm(disjoint) -> ((A + B > 1) -> C = 1 ; C is A + B)
+     ; current_tnorm(minmax) -> minmax_join(A,B,C)).
+
+minmax_join([MinA,MaxA],[MinB,MaxB],[MinC,MaxC]):- 
+    (MinA > MinB -> MinC=MinA ; MinC=MinB),
+    ((MaxA + MaxB > 1) -> MaxC = 1 ; MaxC is MaxA + MaxB).
+
+gte(A,B):- (current_tnorm(minmax) -> gte_minmax(A,B) ; A >= B).
+gt(A,B):- (current_tnorm(minmax) -> gt_minmax(A,B) ; A > B).
+lt(A,B):-  (current_tnorm(minmax) -> lt_minmax(A,B) ; A < B).
+
+gte_minmax([MinA,MaxA],[MinB,MaxB]):- MinA >= MinB,MaxA >= MaxB.
+gt_minmax([MinA,MaxA],[MinB,MaxB]):- MinA > MinB,MaxA > MaxB.
+lt_minmax([MinA,MaxA],[MinB,MaxB]):- MinA < MinB,MaxA < MaxB.
 
 clear:- abolish_all_tables.
 
@@ -242,18 +286,23 @@ set_fuzzy:- set_tnorm(fuzzy).
 set_coinciding:- set_tnorm(fuzzy).
 set_independent:- set_tnorm(independent).
 set_disjoint:- set_tnorm(disjoint).
+set_minmax:- set_tnorm(minmax).
 
 set_tnorm(Norm):- 
-    (memberchk(Norm,[fuzzy,independent,disjoint]) -> 
+    (memberchk(Norm,[fuzzy,independent,disjoint,minmax]) -> 
        true 
-     ; abort((Norm,'is not one of fuzzy,independent,disjoint'))),
+     ; abort((Norm,'is not one of fuzzy,independent,disjoint,minmax'))),
     abolish_all_tables,
     retractall(current_tnorm(_)),
     assert(current_tnorm(Norm)).
 
 % to handle problems w. floating point precision
 equal_at_precision(X,Y,N):- 
-	round(X*(10**N)) =:= round(Y*(10**N)).
+    current_tnorm(minmax) -> eap_minmax(X,Y,N) ; round(X*(10**N)) =:= round(Y*(10**N)).
+
+eap_minmax([A1,A2],[B1,B2],N):- 
+	round(A1*(10**N)) =:= round(B1*(10**N)),
+	round(A2*(10**N)) =:= round(B2*(10**N)).
 
 meta_debug(Atom):- 
 	(mytrace(on) -> writeln(Atom) ; true). 
@@ -281,7 +330,8 @@ _1_t(A,M):-
 	  if(A,B),
 	  get_rule_weight(B,Body,Weight),
           meta_debug(calling(if(A,Body))),
-	  meta_t(Body,1,M_b),
+          get_top(Top),
+	  meta_t(Body,Top,M_b),
           meta_debug(succeeded(if(A,Body,M_b))),
 	  apply_rule_weight(Weight,M_b,M).
 
@@ -317,4 +367,12 @@ get_tval(Lit,List):-
 get_measure(A,M):- 
 	check_ground(A,get_measure/1,1),
 	(A = _A1~M1 -> M = M1 ; get_top(M)).
+
+call_t_complement(A~_call_t_complement(A~_          get_top(Top),M,M_c):- 
+   get_complement(A~1,Compl,_M_c),
+   (meta_1_t(Compl,_),fail ; true),
+   get_residual(meta_1_t(Compl,M_c),[]).
+call_t_complement(A,0):- 
+   get_complement(A~1,Compl,_M_c),
+   \+ get_residual(meta_1_t(Compl,_),[]).
 
