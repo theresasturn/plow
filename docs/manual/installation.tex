@@ -1,0 +1,86 @@
+
+\section{Installing PLOW}
+
+Currently, there are two ways to obtain PLOW:
+
+\bi
+\item {\em Using a version of XSB configured with PITA}.  If you have,
+  or can make a version of XSB that is configured with PITA, simply
+  invoke PLOW like any other package via the command:
+
+\begin{verbatim}
+?- [plow].
+\end{verbatim}
+
+Note that the first time PLOW is used, XSB will automatically download
+PLOW from
+
+{\tt https://github.com/theresasturn/plow.git}.
+
+\item {\em Using a Docker Image}.  This approach is recommended for
+  users who are not proficient in building XSB, although it does
+  require some facility in using Docker.  For this approach simply
+  download an XSB Docker image from Docker Hub ({\tt
+    https://hub.docker.com}), via the commands
+
+\begin{verbatim}
+docker login
+docker pull theresasturn/xsb
+\end{verbatim}
+
+Information about how to use Docker is widely available on the web.
+For those not familiar with Docker, a quick start is as follows.  Run
+the image via the command:
+
+\begin{verbatim}
+docker run -it  theresasturn/xsb
+\end{verbatim}
+
+At this point your command line will be within the docker image (as
+user {\tt root}).  You can now start XSB with the command:
+
+\begin{verbatim}
+/xsb-src/bin/xsb
+\end{verbatim}
+
+At this point, you can invoke PLOW like any other package via the
+command:
+
+\begin{verbatim}
+?- [plow].
+\end{verbatim}
+
+Note that the first time PLOW is used, XSB will automatically download
+PLOW from
+
+{\tt https://github.com/theresasturn/plow.git}.
+
+You can exit from XSB using the usual {\tt ?- halt} command, and exit
+from the Docker session via the command {\tt exit}.  At this point any
+work you have done (such as cloning PLOW) will have been saved into a
+{\em container}, and the container should be used in the future
+whenever you may be changing any files in it.  The container's name can be found using the command 
+
+\begin{verbatim}
+docker ps -a
+\end{verbatim}
+
+and then looking for the {\em NAMES} column corresponding to the {\em
+  IMAGE} {\tt theresasturn/xsb} (e.g., keen\_wright).  Using that
+name, the continer can be reinvoked using the command.
+
+\begin{verbatim}
+docker start -i keen_wright
+\end{verbatim}
+
+Files can be easily copied into the Docker container via the
+command\footnote{Note that additional software can be installed into a
+  container via the command {\tt apt-get install -y}, e.g., {\tt
+    apt-get install -y emacs}.}
+
+\begin{verbatim}
+docker cp <filename> keen_wright:<path-name>
+\end{verbatim}
+
+\ei
+
