@@ -1,0 +1,96 @@
+\subsubsection{Dynamic Stratification} \label{dyn-strat}
+
+One of the most important formulations of stratification is that of
+{\em dynamic} stratification.  \cite{Przy89d} shows that a program has
+a 2-valued well-founded model iff it is dynamically stratified, so
+that it is the weakest notion of stratification that is consistent
+with the well-founded semantics.
+%
+%As presented in~\cite{Przy89d}, dynamic stratification computes strata
+%via operators on \emph{3-valued interpretations} -- pairs of the form
+%$\langle Tr;Fa \rangle$, where $Tr$ and $Fa$ are subsets of the Herbrand
+%base $\cH_P$ of a normal program $P$.
+As presented in~\cite{Przy89d}, dynamic stratification computes strata
+via operators on interpretations of the form $\langle Tr;Fa \rangle$,
+where $Tr$ and $Fa$ are subsets of $\cH_P$.
+%
+%-----------------------------------------------------------------------
+\begin{definition} \label{def:dyn-ops}
+For a normal program $P$, sets $Tr$ and $Fa$ of ground atoms and a
+3-valued interpretation $I$ (sometimes called a pre-interpretation):
+\begin{description} \item[$True^P_I(Tr) =$]
+%                $\{A:val_I(A) \neq {\tt t}$
+    $\{A|A$ is not true in $I$;  and 
+                        there is a clause
+                        $B \leftarrow L_1,...,L_n$
+                in $P$, a grounding substitution $\theta$ such that
+                $A = B\theta$ and for every $1 \leq i \leq n$ either
+                $L_i\theta$ is true in $I$, or $L_i\theta \in Tr$\};
+  \item[$False^P_I(Fa) =$] 
+%$\{A : val_I(A) \neq {\tt f}$ 
+$\{A|A$ is not false in $I$; and for every
+    clause $B \leftarrow L_1,...,L_n$ in $P$ and grounding substitution
+    $\theta$ such that $A = B\theta$ there is some $i$ $(1 \leq i \leq
+    n)$ such that $L_i\theta$ is false in $I$ or $L_i\theta \in Fa\}$.
+\end{description}
+\end{definition}
+%------------------------------------------------------------------------()     
+%
+\cite{Przy89d} shows that $True^P_I$ and $False^P_I$ are both
+monotonic, and defines $\kcaltrue^P_I$ as the least fixed point of $True^P_I(\emptyset)$
+and $\calfalse^P_I$ as the greatest fixed point of
+$False^P_I(\cH_P)$.
+%\footnote{Below, we will sometimes omit the program $P$ in
+%  these operators when the context is clear.}.
+%, along with an
+%operator $\cal I$ that assigns to every interpretation $I$ of $P$ a
+%new interpretation ${\cal I}(I) = I \cup \langle \cT_I ; \cF_I \rangle$.
+%
+In words, the operator $\kcaltrue^P_I$ extends the interpretation $I$ to add
+the new atomic facts that can be derived from $P$ knowing $I$; $\calfalse^P_I$
+adds the new negations of atomic facts that can be shown false in $P$
+by knowing $I$ (via the uncovering of unfounded sets).  An iterated
+fixed point operator builds up dynamic strata by constructing
+successive partial interpretations as follows.
+%----------------------------------------------------------------------          
+\begin{definition}[Iterated Fixed Point and Dynamic Strata]
+\label{def:IFP}
+For a normal program $P$ let 
+
+\begin{center}
+$  \begin{array}{rcl}
+          WFM_0 & = & \langle \emptyset ; \emptyset \rangle;      \\
+ WFM_{\alpha+1} & = &       WFM_{\alpha} \cup
+                                \langle \kcaltrue^P_{WFM_\alpha};\calfalse^P_{WFM_\alpha} \rangle; \\
+     WFM_\alpha & = & \bigcup_{\beta < \alpha} WFM_\beta, \mbox{ for limit ordinal }\alpha.
+  \end{array}
+$
+\end{center}
+
+\noindent
+  $WFM(P)$ denotes the fixed point interpretation $WFM_\delta$,
+  where $\delta$ is the smallest (countable) ordinal such that both
+  sets $\kcaltrue^P_{WFM_\delta}$ and $\calfalse^P_{WFM_\delta}$ are empty.
+%($\delta$ exists, and is
+%  a countable ordinal because both $\kcaltrue_I$ and $\calfalse^P_I$ are monotonically
+%  increasing).  
+% We refer to $\delta$ as the {\em depth} of program $P$.  
+The {\em stratum} of atom $A$, is the least ordinal $\beta$ such that
+   $A \in WFM_{\beta}$.
+% (where $A$ may be either in the true or false
+%   component of $WFM_{\beta}$).
+\end{definition}
+%------------------------------------------------------------------------()      
+%
+\cite{Przy89d} shows that %the iterated fixed point 
+$WFM(P)$ is in fact the well-founded model and that any undefined
+atoms of the well-founded model do not belong to any stratum --
+i.e. they are not added to $WFM_{\delta}$ for any ordinal
+$\delta$. Thus, a program is \emph{dynamically stratified} if every
+atom belongs to a stratum.
+
+%------------------------------------------------------------------------
+% taking out fixed-order stuff until we put LPADs in (though maybe we
+% wont even need it then )
+
+%\input{fixed-order-dynstrat}

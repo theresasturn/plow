@@ -1,0 +1,141 @@
+\documentclass{tlp}
+%\documentclass[letterpaper]{article}
+%\usepackage{aaai}
+\usepackage{times}
+\usepackage{helvet}
+\usepackage{courier}
+\setlength{\pdfpagewidth}{8.5in}
+\setlength{\pdfpageheight}{11in}
+                                                                                 
+\frenchspacing
+
+\usepackage{epsfig}
+%\usepackage{amssymb}
+%\usepackage{url}
+%\usepackage{graphicx}
+%\usepackage{subfigure}
+%\usepackage[dvips,all]{xy}
+%\usepackage[usenames]{color}  % using for comments during paper writing.
+
+\newcommand\tls[1]{}
+\newcommand\cA{{\cal A}}
+\newcommand\cB{{\cal B}}
+\newcommand\cC{{\cal C}}
+\newcommand\cD{{\cal D}}
+\newcommand\cE{{\cal E}}
+\newcommand\cF{{\cal F}}
+\newcommand\cG{{\cal G}}
+\newcommand\cH{{\cal H}}
+\newcommand\cI{{\cal I}}
+\newcommand\cJ{{\cal J}}
+\newcommand\cL{{\cal L}}
+\newcommand\cM{{\cal M}}
+\newcommand\cO{{\cal O}}
+\newcommand\cP{{\cal P}}
+\newcommand\cR{{\cal R}}
+\newcommand\cS{{\cal S}}
+\newcommand\cT{{\cal T}}
+\newcommand\cU{{\cal U}}
+\newcommand\cV{{\cal V}}
+\newcommand\cW{{\cal W}}
+\newcommand\la{\leftarrow}
+%\newcommand{\nf}{\mathord\mathbf{not}\,}
+%\newcommand{\nf}{{not}\,}
+\newcommand{\naf}{{naf}\,}
+%\newcommand{\ourneg}{\mbox{{\it neg }}}
+\newcommand{\ourneg}{\neg}
+\newcommand{\posvar}{\hat{\cal V}}
+
+\newcommand\ourfinitary{dynamically-finitary}
+\newcommand\Ourfinitary{Dynamically-finitary}
+\newcommand\boundedtermsize{bounded term-size}
+\newcommand\Boundedtermsize{Bounded Term-size}
+\newcommand\bts{bounded term-size}
+\newcommand\Bts{Bounded term-size}
+\newcommand\BTs{Bounded Term-size}
+\newcommand\bi{\begin{itemize}}
+\newcommand\ei{\end{itemize}}
+\newcommand{\newsg}{{\sc New Subgoal}}
+\newcommand{\anscr}{{\sc Positive Return}}
+\newcommand{\ansret}{{\sc Positive Return}}
+\newcommand{\negsuc}{{\sc Negation Success}}
+\newcommand{\negfail}{{\sc Negation Failure}}
+\newcommand{\delay}{{\sc Delaying}}
+\newcommand{\mif}{\leftarrow}
+\newcommand{\pgmcr}{{\sc Program Clause Resolution}}
+\newcommand{\negret}{{\sc Negative Return}}
+\newcommand{\simpl}{{\sc Simplification}}
+\newcommand{\compl}{{\sc Completion}}
+\newcommand{\anscompl}{{\sc Answer Completion}}
+\newcommand{\undef}{\mathit{undefined}_{abs}}
+\newcommand\ourmodels{radially restrained models}
+\newcommand\OurModels{Radially Restrained Models}
+\mathchardef\mhyphen="2D
+
+%\newcommand\ourWFM{abs \mhyphen WFM}
+\newcommand\ourWFM{WFM}
+%\newcommand\ktrue{abs \mhyphen True}
+\newcommand\ktrue{True}
+%\newcommand\kcaltrue{abs \mhyphen \cT}
+\newcommand\kcaltrue{\mathcal{TR}}
+\newcommand\calfalse{{\cal FA}}
+\newcommand\functions{{\cal FN}}
+\newcommand\oldSLG{SLG$_{{\sf SA}}$}
+\newcommand\newSLG{SLG$_{{\sf ABS}}$}
+%\newcommand{\mathnewSLG{SLG_{{\sf ABS}}}
+%\newcommand\ktrue{k\mhyphen True}
+
+\newtheorem{theorem}{Theorem} % [section]
+\newtheorem{lemma}{Lemma} % [section]
+\newtheorem{definition}{Definition} % [section]
+\newtheorem{corollary}{Corollary} % [section]
+\newtheorem{proposition}{Proposition} % [section]
+\newtheorem{example}{Example} % [section]
+\newcommand{\pivot}[1]{\mathbin{\, {#1} \,}}
+\newcommand{\Pivot}[1]{\mathbin{\; {#1} \;}}
+\newcommand{\algorithm}{PITA}
+
+\let\from=\leftarrow
+\long\def\comment#1{}
+
+\setcounter{secnumdepth}{0}  
+\begin{document}
+
+\title{Some Damn Title...}
+
+\author{Some Permutation of: Benjamin, Fabrizo and Teri}  
+
+%\nocopyright
+\maketitle
+
+%\input{abstract}
+
+%\input{intro}
+\input{prelim}
+%\input{models}
+
+%\input{slg}
+
+%\input{complexity}
+
+%\input{perf}
+
+%\input{disc}
+
+%\input{appendix}
+
+%\section{Acknowledgements}
+%The authors would like to acknowledge support 
+
+%\bibliographystyle{acmtrans}
+%\newpage
+
+\newpage
+\bibliographystyle{plain}
+\bibliography{longstring,all}
+
+%\newpage
+%\appendix
+%\input{appendix}
+
+\end{document}

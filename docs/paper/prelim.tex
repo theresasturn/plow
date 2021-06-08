@@ -1,0 +1,333 @@
+\section{Semantics}\label{sec:semantics}
+%
+{\sc First Pass: assume fixed Godel T norm -- we can extend to other
+  tnorms and to distribution semantics later.  Even after simplifying,
+  there are several land mines to navigate.
+
+TODO!!! 
+Unfounded sets. and continue with the definition below.
+}
+
+
+%We assume a general knowledge of logic programming terminology,
+%including tabled resolution and the well-founded semantics.  In
+%addition we make use of the following terminology and assumptions.
+
+TES: Ground should include annotation
+
+An {\em annotated atom} is an atom $A$ associated with an annotation
+$n$, $0 \leq n \leq 1$, denoted $A:n$.  From an annotated atom {\em
+  A:n}, an {\em objective literal} $O$ is formed as $O = A:n$ termed a
+positive objective literal with $sign(O) = pos$; or as $O = \ourneg A:n$
+termed a negative objective literal with $sign(O) = neg$.  In either
+case the annotation, $n$, is denoted as $ annotation(O)$, while the
+underlying atom, $A$, is $atom(A)$.
+%
+Two objective literals $O_1$ and $O_2$ with the same underlying atom are {\em homologs} if they have the same sign and {\em conjugates} otherwise.
+%
+% = A:n$ and $O_2 = \neg A:m$ are termed {\em conjugates}.
+%denoted as $O_1 = conjugate(O_2)$ or $O_2 = conjugate(O_1)$; 
+%Otherwise if $atom(O_1) = atom(O_2)$ $O_1$ and $O_2$ are termed {\em
+%  homologs}.
+%
+%, denoted as $O_1 = homolog(O_2)$ or $O_2 = homolog(O_1)$.
+From an objective literal $O$ a default literal is formed as either a
+positive default literal $O$ or as a negative default literal $\naf
+O$.
+\footnote{
+When convenient, an objective literal $A:1$ ($\neg A:1$) is denoted
+simply as $A$ ($\neg A$).}
+
+Our attention is restricted to three-valued (partial) interpretations
+and models such as those extending the well-founded model.  Each such
+interpretation $\cI$ is represented as a pair of sets of ground
+objective literals: $\cT$ and $\cF$.
+
+{\sc TES: In the following, I dont yet feel confident about my $>$'s and my
+$\geq$'s.  ... conflicting truth values are mapped to U, but in the
+edge case, I'd like true to outweigh false (as with $r$ below).}
+
+
+\begin{definition} \label{def:satisfiable}
+Let $P$ be a ground objective literal $O$ with
+% $atom(O) = A$ and 
+$annotation(O) = n$.
+
+$O$ is true in $\cI$ if
+\begin{itemize}
+\item There exists an $O_T$ in $\cT$ such that $O_T$ is a homolog of
+  $O$ and $annotation(O_T) \geq n$, and
+\begin{itemize}
+\item $\cT$ does not contain a conjugate $O_C$ of $O$ with
+  $annotation(O_C) > (1-n)$ and
+\item $\cF$ does not contain a homolog $O_F$ of $O$ with $annotation(O_F) > (1-n)$.
+\end{itemize}
+\end{itemize}
+
+%----------------------------------------------------------------                
+$O$ is false in $\cI$ if 
+\begin{itemize}
+\item $\cT$ does not contain a homolog $O_T$ of $O$ with
+  $annotation(O_T) \geq (1-n)$; and 
+\begin{itemize}
+\item $\cF$ contains a homolog $O_F$ of $O$ with $annotation(O_F) \geq n$.
+\item $\cT$ contains a conjugate $O_C$ of $O$ with $annotation(O_C) \geq n$.
+%Either $A:n_1 \in \cF$ for $n_1 \geq m$ or $\ourneg A:n_2 \in \cT$ for
+%$m_2 \geq m$; and
+\end{itemize}
+\end{itemize}
+A positive literal $O$ is true (false) in $\cI$ if $O$ is true (false)
+in $\cI$; a negative literal $naf O$ is true in $\cI$ if $O$ is false
+in $\cI$ and is false in $\cL$ if $O$ is true in $\cI$.
+
+$O$ is undefined in $\cI$ if it is neither true nor false in $\cI$.
+\end{definition}
+%----------------------------------------------------------------                
+
+%\begin{definition} \label{def:satisfiable}
+%A ground annotated atom $A:m$ is true in $\cI$ if 
+%\begin{itemize}
+%\item There exists an $A:n_1 \in \cT$ with $n_1\geq m$, and 
+%\begin{itemize}
+%\item $\cT$ does not contain $\ourneg A:n_2$ with $n_2 > (1-m)$ and
+%\item   $\cF$ does not contain $A:n_3$ with $n_3 > (1-m)$.
+%\end{itemize}
+%\end{itemize}
+%A ground annotated atom $A:m$ is false in $\cI$ if 
+%\begin{itemize}
+%\item Either $A:n_1 \in \cF$ for $n_1 \geq m$ or $\ourneg A:n_2 \in \cT$
+%  for $m_2 \geq m$; and
+%\item $\cT$ does not contain $A:n_3$ for $n_3 \geq (1-m)$.
+%\end{itemize}
+%\end{definition}
+
+\begin{example} 
+Consider the interpretation $\cI_1$ where $\cT = \{p:0.7,q:0.5, r:0.6,
+\ourneg r:0.5\}$ and $\cF = \{p:0.4, q:0.5\}$.  $p:0.6$ is true in
+$\cI$ and $p:0.8$ false, but $p:.7$ is neither true nor false; $q:0.5$
+is true in $\cI$; and $r:5$ is true in $\cI$ but $r:0.7$ is false.
+\end{example}
+
+\begin{definition}
+A rule has the form
+\[r = O \mif{} L_1,\ldots,L_n\]
+where $O$ is an objective literal and $L_0,\ldots,L_n$ are default
+literals.
+
+A program is ... (ground) 
+\end{definition}
+
+%An objective literal $O$ is undefined in $\cI$ if $O \neg \hat{\in}
+%\cT$ and $O \neg \hat{\in} \cF$.
+
+%----------------------------------------------------------------                 
+\begin{definition}[Reduction of $P$ modulo $\cI$] \label{def:reduction}
+%                                                                                
+Let $\cI$ be an interpretation of a program, $P$.  By the {\em
+  reduction of $P$ modulo $\cI$} we mean a new program $\frac{P}{\cI}$
+obtained from $P$ by performing the following operations:
+\begin{enumerate}
+\item Remove from $P$ all rules that contain a literal that is false
+  in $\cI$.
+\item Remove from all the remaining rules those literals that are true
+  in $\cI$
+\end{enumerate}
+\end{definition}
+
+Need to define the essentially undefined set in order to separate the
+truth values of conjugates.  If the semantics is equivalent to
+rewriting each rule $r$ for $p$ so that $\naf conjugate(p)$ is in the
+body of $r$ then a program like 
+
+\begin{verbatim} 
+p.
+neg p :- not neg p.
+\end{verbatim}
+
+\noindent
+will be able to derive neither p nor neg p.
+
+I believe that this is what is done in WFSX, but this seems a bit
+weaker than necessary.  Essentially, we can conclude an objective
+literal if we know that its conjugate is essentially undefined (as
+below).  And we can determine this easily enough if its conjugate has
+been completely evaluated and yet is still undefined.
+
+\begin{definition}
+Given a program $\cP$, there is a dependency edge from an objective
+literal $O_1$ to an objective literal $O_2$ if there is a rule $R \in
+\cP$ such that $O_1$ is the head of $R$ and $O_2$ occurs in a literal
+$L$ in the body of $R$.  If $O_2$ occurs in a positive literal the
+edge is positive; if $O_2$ occurs in a negative literal the edge is
+negative.  
+
+There is a path between objective literals $O_1$ and $O_2$ in $\cP$ if
+there is an edge bwtween $O_1$ and $O_2$ in $\cP$, or if there is a
+path between $O_1$ and an objective literal $O_3$ and there is an edge
+between $O_3$ and $O_2$.
+
+The direct dependencies of an objective literal $\cO$ are those
+literals to which $\cO$ has a dependency edge.  
+%The dependencies of $\cO$ are those literals to which there is a path
+from $\cO$.
+
+An objective literal $O$ is involved in a negative loop if there is a
+path from $O$ to itself that involves a negative edge.
+
+%Given a program $\cP$, its essentially undefined set $\cU_{\cP}$ is
+%constructed as follows.
+
+An objective literal $O$ is essentially undefined if $O$ is involved
+in a negative loop and every direct dependency of $O$ is involved in a
+negative loop; or if every rule with head $O$ has a non-empty body,
+and every direct dependency of $O$ is essentially undefined.
+
+Given a program $\cP$ and interpretation $\cI$, the essentially
+undefined set $\cU_{\cI}$ consists of all essentially undefined
+objective literals in $\frac{\cP}{\cI}$.
+
+\end{definition}
+
+%----------------------------------------------------------------                 
+\subsection{Well-Founded Model}
+
+Motivation: consider the program
+\begin{verbatim}
+p:0.8:- not p:0.8.
+p:0.5.
+neg p:0.3.
+\end{verbatim}
+We want a model with p:0.5 as true, p:0.7 as false and p:0.6 as u.
+However, if the rule {\tt p:0.8:- not p:0.8.} were removed, p:0.6
+would be false.
+
+\comment{
+For two interpretations, $\cI$ and $\cJ$, $\cI
+\subseteq \cJ$ iff $true(\cI) \subseteq true(\cJ)$ and $false(\cI)
+\subseteq false(\cJ)$.  Alternatively, a three-value interpretation
+can be represented as a set of literals.
+
+A program $P$ is {\em safe} if each rule $r$ in $P$ is such that every
+variable in $r$ occurs in a positive literal in the body of $r$.  
+
+Symbols within a term may be represented through {\em positions} which
+are members of the set $\Pi$.  A {\em position\/} in a term is either
+the empty string $\Lambda$ that reaches the root of the term, or the
+string $\pi.i$ that reaches the $i$th child of the term reached by
+$\pi$, where $\pi$ is a position and $i$ an integer.  For a term $t$
+we denote the symbol at position $\pi$ in $t$ by $t_\pi$.  For
+example, $p(a,f(X))_{2.1} = X$.  We assume that a program $P$ is
+defined over a language $\cL$, containing a finite set $\functions$ of
+predicate and function symbols, and a countable set of variables from
+the set ${\cal V} \cup \posvar$.  Elements of the set $\cal V$ are
+referred to as {\em program variables}.  Elements of the set
+$\posvar$, called {\em position variables}, are of the form $X_\pi$,
+where $\pi$ is a position.
+%
+These variables are used when it is convenient to mark certain
+positions of interest in a term.  The Herbrand Universe of $\cL$ is
+denoted $\cH_{\cL}$, or as $\cH_{P}$ if $\cL$ consists of the
+predicate and function symbols in $P$; similarly the Herbrand Base is
+denoted as $\cB_{\cL}$ or as $\cB_P$.  Throughout the paper variant
+terms are considered to be equal.
+}
+
+\subsubsection{Dynamic Stratification} \label{dyn-strat}
+
+One of the most important formulations of stratification is that of
+{\em dynamic} stratification.  \cite{Przy89d} shows that a program has
+a 2-valued well-founded model iff it is dynamically stratified, so
+that it is the weakest notion of stratification that is consistent
+with the well-founded semantics.
+%
+As presented in~\cite{Przy89d}, dynamic stratification computes strata
+via operators on interpretations of the form $\langle Tr;Fa \rangle$,
+where $Tr$ and $Fa$ are subsets of $\cH_P$.
+%
+
+Given a set $\cS$ of ground objective literals, a ground objective
+literal $A:m \hat{\in} \cS$ if $A:n \in \cS$ with $n \geq m$.
+
+
+??? are rules defined properly???
+
+%-----------------------------------------------------------------------
+\begin{definition} \label{def:dyn-ops}
+For a normal program $P$, sets $Tr$ and $Fa$ of ground atoms and a
+3-valued interpretation $I = (\cT,\cF)$ (sometimes called a pre-interpretation):
+\begin{description} \item[$True^P_I(Tr) =$]
+    $\{A|A$ is not true in $I$;  and 
+                        there is a clause
+                        $B \leftarrow L_1,...,L_n$
+                in $P$, a grounding substitution $\theta$ such that
+                $A = B\theta$ and for every $1 \leq i \leq n$ either
+                $L_i\theta$ is true in $I$, or $L_i\theta \in Tr$\};
+  \item[$False^P_I(Fa) =$] 
+%$\{A : val_I(A) \neq {\tt f}$ 
+$\{A|A$ is not false in $I$; and for every
+    clause $B \leftarrow L_1,...,L_n$ in $P$ and grounding substitution
+    $\theta$ such that $A = B\theta$ there is some $i$ $(1 \leq i \leq
+    n)$ such that $L_i\theta$ is false in $I$ or $L_i\theta \in Fa\}$.
+\end{description}
+\end{definition}
+%------------------------------------------------------------------------()     
+%
+\cite{Przy89d} shows that $True^P_I$ and $False^P_I$ are both
+monotonic, and defines $\kcaltrue^P_I$ as the least fixed point of $True^P_I(\emptyset)$
+and $\calfalse^P_I$ as the greatest fixed point of
+$False^P_I(\cH_P)$.
+%\footnote{Below, we will sometimes omit the program $P$ in
+%  these operators when the context is clear.}.
+%, along with an
+%operator $\cal I$ that assigns to every interpretation $I$ of $P$ a
+%new interpretation ${\cal I}(I) = I \cup \langle \cT_I ; \cF_I \rangle$.
+%
+In words, the operator $\kcaltrue^P_I$ extends the interpretation $I$ to add
+the new atomic facts that can be derived from $P$ knowing $I$; $\calfalse^P_I$
+adds the new negations of atomic facts that can be shown false in $P$
+by knowing $I$ (via the uncovering of unfounded sets).  An iterated
+fixed point operator builds up dynamic strata by constructing
+successive partial interpretations as follows.
+%----------------------------------------------------------------------          
+\begin{definition}[Iterated Fixed Point and Dynamic Strata]
+\label{def:IFP}
+For a normal program $P$ let 
+
+\begin{center}
+$  \begin{array}{rcl}
+          WFM_0 & = & \langle \emptyset ; \emptyset \rangle;      \\
+ WFM_{\alpha+1} & = &       WFM_{\alpha} \cup
+                                \langle \kcaltrue^P_{WFM_\alpha};\calfalse^P_{WFM_\alpha} \rangle; \\
+     WFM_\alpha & = & \bigcup_{\beta < \alpha} WFM_\beta, \mbox{ for limit ordinal }\alpha.
+  \end{array}
+$
+\end{center}
+
+\noindent
+  $WFM(P)$ denotes the fixed point interpretation $WFM_\delta$,
+  where $\delta$ is the smallest (countable) ordinal such that both
+  sets $\kcaltrue^P_{WFM_\delta}$ and $\calfalse^P_{WFM_\delta}$ are empty.
+%($\delta$ exists, and is
+%  a countable ordinal because both $\kcaltrue_I$ and $\calfalse^P_I$ are monotonically
+%  increasing).  
+% We refer to $\delta$ as the {\em depth} of program $P$.  
+The {\em stratum} of atom $A$, is the least ordinal $\beta$ such that
+   $A \in WFM_{\beta}$.
+% (where $A$ may be either in the true or false
+%   component of $WFM_{\beta}$).
+\end{definition}
+%------------------------------------------------------------------------()      
+%
+\cite{Przy89d} shows that %the iterated fixed point 
+$WFM(P)$ is in fact the well-founded model and that any undefined
+atoms of the well-founded model do not belong to any stratum --
+i.e. they are not added to $WFM_{\delta}$ for any ordinal
+$\delta$. Thus, a program is \emph{dynamically stratified} if every
+atom belongs to a stratum.
+
+%------------------------------------------------------------------------
+% taking out fixed-order stuff until we put LPADs in (though maybe we
+% wont even need it then )
+
+%\input{fixed-order-dynstrat}
+
