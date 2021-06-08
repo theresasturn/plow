@@ -8,22 +8,24 @@ TODO!!!
 Unfounded sets. and continue with the definition below.
 }
 
-
+\subsection{Preliminaries}
 %We assume a general knowledge of logic programming terminology,
 %including tabled resolution and the well-founded semantics.  In
 %addition we make use of the following terminology and assumptions.
 
-TES: Ground should include annotation
-
 An {\em annotated atom} is an atom $A$ associated with an annotation
-$n$, $0 \leq n \leq 1$, denoted $A:n$.  From an annotated atom {\em
-  A:n}, an {\em objective literal} $O$ is formed as $O = A:n$ termed a
-positive objective literal with $sign(O) = pos$; or as $O = \ourneg A:n$
-termed a negative objective literal with $sign(O) = neg$.  In either
-case the annotation, $n$, is denoted as $ annotation(O)$, while the
-underlying atom, $A$, is $atom(A)$.
+$n$ that is either a variable or $0 \leq n \leq 1$, denoted $A:n$.
+From an annotated atom {\em A:n}, an {\em objective literal} $O$ is
+formed as either $O = A:n$, termed a positive objective literal with
+$sign(O) = pos$; or aa $O = \ourneg A:n$, termed a negative objective
+literal with $sign(O) = neg$.  In either case the annotation, $n$, is
+denoted as $ annotation(O)$, while the underlying atom, $A$, is
+$atom(A)$.
 %
-Two objective literals $O_1$ and $O_2$ with the same underlying atom are {\em homologs} if they have the same sign and {\em conjugates} otherwise.
+Two objective literals $O_1$ and $O_2$ with the same underlying atom
+are {\em homologs} if they have the same sign and {\em conjugates}
+otherwise.  An objective literal $A:n$ is ground if both $A$ and $n$
+are ground.
 %
 % = A:n$ and $O_2 = \neg A:m$ are termed {\em conjugates}.
 %denoted as $O_1 = conjugate(O_2)$ or $O_2 = conjugate(O_1)$; 
@@ -33,56 +35,69 @@ Two objective literals $O_1$ and $O_2$ with the same underlying atom are {\em ho
 %, denoted as $O_1 = homolog(O_2)$ or $O_2 = homolog(O_1)$.
 From an objective literal $O$ a default literal is formed as either a
 positive default literal $O$ or as a negative default literal $\naf
-O$.
+O$.  A default literal is sometimes simply called a {\em literal}.
 \footnote{
 When convenient, an objective literal $A:1$ ($\neg A:1$) is denoted
 simply as $A$ ($\neg A$).}
+
+A rule has the form
+\[r = O \mif{} L_1,\ldots,L_n\]
+where $O$ is an objective literal and $L_0,\ldots,L_n$ are default
+literals.
+
+A rule $R$ is ground if all literals in $R$ are ground; a program
+$\cP$ is ground if all rules in $\cP$ are ground.
+
+
+%An objective literal $O$ is undefined in $\cI$ if $O \neg \hat{\in}
+
+\subsection{Three-Valued Models for Annotated Atoms} 
 
 Our attention is restricted to three-valued (partial) interpretations
 and models such as those extending the well-founded model.  Each such
 interpretation $\cI$ is represented as a pair of sets of ground
 objective literals: $\cT$ and $\cF$.
 
-{\sc TES: In the following, I dont yet feel confident about my $>$'s and my
-$\geq$'s.  ... conflicting truth values are mapped to U, but in the
-edge case, I'd like true to outweigh false (as with $r$ below).}
-
+%{\sc TES: In the following, I dont yet feel confident about my $>$'s and my
+%$\geq$'s.  ... conflicting truth values are mapped to U, but in the
+%edge case, I'd like true to outweigh false (as with $r$ below).}
 
 \begin{definition} \label{def:satisfiable}
 Let $P$ be a ground objective literal $O$ with
 % $atom(O) = A$ and 
-$annotation(O) = n$.
+$annotation(O) = n$, and $\cI$ an interpretation.
 
 $O$ is true in $\cI$ if
 \begin{itemize}
-\item There exists an $O_T$ in $\cT$ such that $O_T$ is a homolog of
-  $O$ and $annotation(O_T) \geq n$, and
-\begin{itemize}
+\item $\cT$ contains an $O_T$ such that $O_T$ is a homolog of
+  $O$ and $annotation(O_T) \geq n$; and
 \item $\cT$ does not contain a conjugate $O_C$ of $O$ with
-  $annotation(O_C) > (1-n)$ and
-\item $\cF$ does not contain a homolog $O_F$ of $O$ with $annotation(O_F) > (1-n)$.
-\end{itemize}
+  $annotation(O_C) \geq (1-n)$; and
+\item $\cF$ does not contain a homolog $O_F$ of $O$ with
+  $annotation(O_F) \geq (1-n)$.
 \end{itemize}
 
 %----------------------------------------------------------------                
 $O$ is false in $\cI$ if 
 \begin{itemize}
 \item $\cT$ does not contain a homolog $O_T$ of $O$ with
-  $annotation(O_T) \geq (1-n)$; and 
-\begin{itemize}
-\item $\cF$ contains a homolog $O_F$ of $O$ with $annotation(O_F) \geq n$.
+  $annotation(O_T) \geq (1-n)$; and either
+\begin{itemize}  
+\item $\cF$ contains a homolog $O_F$ of $O$ with $annotation(O_F) \geq
+  n$; or 
 \item $\cT$ contains a conjugate $O_C$ of $O$ with $annotation(O_C) \geq n$.
 %Either $A:n_1 \in \cF$ for $n_1 \geq m$ or $\ourneg A:n_2 \in \cT$ for
 %$m_2 \geq m$; and
 \end{itemize}
 \end{itemize}
+$O$ is $\ourU$ in $\cI$ if it is neither true nor false in $\cI$.
+
 A positive literal $O$ is true (false) in $\cI$ if $O$ is true (false)
 in $\cI$; a negative literal $naf O$ is true in $\cI$ if $O$ is false
-in $\cI$ and is false in $\cL$ if $O$ is true in $\cI$.
-
-$O$ is undefined in $\cI$ if it is neither true nor false in $\cI$.
+in $\cI$ and is false in $\cL$ if $O$ is true in $\cI$.  A literal is
+$\ourU$ in $\cI$ if it is neither true nore false in $\cI$.
 \end{definition}
-%----------------------------------------------------------------                
+%----------------------------------------------------------------              
 
 %\begin{definition} \label{def:satisfiable}
 %A ground annotated atom $A:m$ is true in $\cI$ if 
@@ -101,65 +116,51 @@ $O$ is undefined in $\cI$ if it is neither true nor false in $\cI$.
 %\end{itemize}
 %\end{definition}
 
+Note that in the above definition the truth value \ourU{} captures
+both the traditional case where a literal is undefined, along with the
+case where a literal is overdefined.
+
 \begin{example} 
-Consider the interpretation $\cI_1$ where $\cT = \{p:0.7,q:0.5, r:0.6,
-\ourneg r:0.5\}$ and $\cF = \{p:0.4, q:0.5\}$.  $p:0.6$ is true in
-$\cI$ and $p:0.8$ false, but $p:.7$ is neither true nor false; $q:0.5$
-is true in $\cI$; and $r:5$ is true in $\cI$ but $r:0.7$ is false.
+  Consider the interpretation $\cI_1$ where
+\begin{itemize}
+\item  $\cT = \{p:0.7,q:0.5, r:0.6,\ourneg r:0.5\}$
+\item $\cF = \{p:0.4, q:0.5\}$.
+\end{itemize}
+$p:0.6$ is true in $\cI$ and $p:0.8$ false, but $p:0.7$ is \ourU ;
+$q:0.5$ is \ourU{} in $\cI$. $r:0.4$ is true in $\cI$ but $r:0.7$ is
+false; $r:n$ is \ourU{} for $0.5 \leq n \leq 0.6$.
 \end{example}
 
-\begin{definition}
-A rule has the form
-\[r = O \mif{} L_1,\ldots,L_n\]
-where $O$ is an objective literal and $L_0,\ldots,L_n$ are default
-literals.
-
-A program is ... (ground) 
-\end{definition}
-
-%An objective literal $O$ is undefined in $\cI$ if $O \neg \hat{\in}
 %\cT$ and $O \neg \hat{\in} \cF$.
 
-%----------------------------------------------------------------                 
-\begin{definition}[Reduction of $P$ modulo $\cI$] \label{def:reduction}
+%----------------------------------------------------------------
+
+Given Definition~\ref{def:satisfiable}, the definition of the
+reduction of a program is the same as for normal logic progams.
+
+\begin{definition}[Reduction of $\cP$ modulo $\cI$] \label{def:reduction}
 %                                                                                
-Let $\cI$ be an interpretation of a program, $P$.  By the {\em
-  reduction of $P$ modulo $\cI$} we mean a new program $\frac{P}{\cI}$
-obtained from $P$ by performing the following operations:
+Let $\cI$ be an interpretation and $\cP$ a program, both over the same
+langage $\cL$.  By the {\em reduction of $P$ modulo $\cI$} we mean a
+new program $\frac{P}{\cI}$ obtained from $P$ by performing the
+following operations:
 \begin{enumerate}
-\item Remove from $P$ all rules that contain a literal that is false
+\item Remove from $\cP$ all rules that contain a literal that is false
   in $\cI$.
 \item Remove from all the remaining rules those literals that are true
   in $\cI$
 \end{enumerate}
 \end{definition}
 
-Need to define the essentially undefined set in order to separate the
-truth values of conjugates.  If the semantics is equivalent to
-rewriting each rule $r$ for $p$ so that $\naf conjugate(p)$ is in the
-body of $r$ then a program like 
+TES: not sure this def is necessary.
 
-\begin{verbatim} 
-p.
-neg p :- not neg p.
-\end{verbatim}
-
-\noindent
-will be able to derive neither p nor neg p.
-
-I believe that this is what is done in WFSX, but this seems a bit
-weaker than necessary.  Essentially, we can conclude an objective
-literal if we know that its conjugate is essentially undefined (as
-below).  And we can determine this easily enough if its conjugate has
-been completely evaluated and yet is still undefined.
-
-\begin{definition}
+\begin{definition}[Unfounded Sets]
 Given a program $\cP$, there is a dependency edge from an objective
 literal $O_1$ to an objective literal $O_2$ if there is a rule $R \in
 \cP$ such that $O_1$ is the head of $R$ and $O_2$ occurs in a literal
-$L$ in the body of $R$.  If $O_2$ occurs in a positive literal the
-edge is positive; if $O_2$ occurs in a negative literal the edge is
-negative.  
+$L$ in the body of $R$.  If $O_2$ occurs in a positive default literal
+the edge is positive; if $O_2$ occurs in a negative default literal
+the edge is negative.
 
 There is a path between objective literals $O_1$ and $O_2$ in $\cP$ if
 there is an edge bwtween $O_1$ and $O_2$ in $\cP$, or if there is a
@@ -174,19 +175,35 @@ from $\cO$.
 An objective literal $O$ is involved in a negative loop if there is a
 path from $O$ to itself that involves a negative edge.
 
-%Given a program $\cP$, its essentially undefined set $\cU_{\cP}$ is
-%constructed as follows.
-
-An objective literal $O$ is essentially undefined if $O$ is involved
-in a negative loop and every direct dependency of $O$ is involved in a
+An objective literal $O$ is {\em unfounded} if $O$ is involved in a
+negative loop and every direct dependency of $O$ is involved in a
 negative loop; or if every rule with head $O$ has a non-empty body,
-and every direct dependency of $O$ is essentially undefined.
+and every direct dependency of $O$ is unfounded.
 
-Given a program $\cP$ and interpretation $\cI$, the essentially
-undefined set $\cU_{\cI}$ consists of all essentially undefined
-objective literals in $\frac{\cP}{\cI}$.
+Given a program $\cP$ and interpretation $\cI$, the {\em unfounded
+  set} $\cU_{\cI}$ consists of all unfounded objective literals in
+$\frac{\cP}{\cI}$.
 
 \end{definition}
+
+Unfounded sets will be used to separate the truth values of
+conjugates.  If the semantics is equivalent to rewriting each rule $r$
+for $p$ so that $\naf conjugate(p)$ is in the body of $r$ then a
+program like
+
+\begin{verbatim} 
+p.
+neg p :- not neg p.
+\end{verbatim}
+
+\noindent
+will be able to derive neither p nor neg p.
+
+%I believe that this is what is done in WFSX, but this seems a bit
+%weaker than necessary.  Essentially, we can conclude an objective
+%literal if we know that its conjugate is essentially undefined (as
+%below).  And we can determine this easily enough if its conjugate has
+%been completely evaluated and yet is still undefined.
 
 %----------------------------------------------------------------                 
 \subsection{Well-Founded Model}
