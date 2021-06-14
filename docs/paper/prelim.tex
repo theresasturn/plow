@@ -1,24 +1,22 @@
-\section{Semantics}\label{sec:semantics}
+\section{Preliminaries}\label{sec:prelim}
 %
 {\sc First Pass: assume fixed Godel T norm -- we can extend to other
-  tnorms and to distribution semantics later.  Even after simplifying,
-  there are several land mines to navigate.
-
-TODO!!! 
-Unfounded sets. and continue with the definition below.
+  tnorms and to distribution semantics later.  
 }
 
-\subsection{Preliminaries}
-%We assume a general knowledge of logic programming terminology,
-%including tabled resolution and the well-founded semantics.  In
-%addition we make use of the following terminology and assumptions.
+Throughout this paper, we assume a general knowledge of logic
+programming terminology, including tabled resolution and the
+well-founded semantics including both default and explicit negation as
+in \cite{AlDP95}.  Here, we include notation and definitions that will
+be used for our proof of the correctness of Plow.
 
 An {\em annotated atom} is an atom $A$ associated with an annotation
 $n$ that is either a variable or $0 \leq n \leq 1$, denoted $A:n$.
 From an annotated atom {\em A:n}, an {\em objective literal} $O$ is
 formed as either $O = A:n$, termed a positive objective literal with
 $sign(O) = pos$; or aa $O = \ourneg A:n$, termed a negative objective
-literal with $sign(O) = neg$.  In either case the annotation, $n$, is
+literal with $sign(O) = \ourneg$, and the \ourneg{} symbol denotes
+{\em explicit negation}.  In either case the annotation, $n$, is
 denoted as $ annotation(O)$, while the underlying atom, $A$, is
 $atom(A)$.
 %
@@ -35,7 +33,8 @@ are ground.
 %, denoted as $O_1 = homolog(O_2)$ or $O_2 = homolog(O_1)$.
 From an objective literal $O$ a default literal is formed as either a
 positive default literal $O$ or as a negative default literal $\naf
-O$.  A default literal is sometimes simply called a {\em literal}.
+O$, where \naf{} denotes {\em default negation}.  A default literal is
+sometimes simply called a {\em literal}.
 \footnote{
 When convenient, an objective literal $A:1$ ($\neg A:1$) is denoted
 simply as $A$ ($\neg A$).}
@@ -51,12 +50,12 @@ $\cP$ is ground if all rules in $\cP$ are ground.
 
 %An objective literal $O$ is undefined in $\cI$ if $O \neg \hat{\in}
 
-\subsection{Three-Valued Models for Annotated Atoms} 
+%\subsection{Three-Valued Models for Annotated Atoms} 
 
 Our attention is restricted to three-valued (partial) interpretations
 and models such as those extending the well-founded model.  Each such
 interpretation $\cI$ is represented as a pair of sets of ground
-objective literals: $\cT$ and $\cF$.
+objective literals: ($\cT$,$za\cF$).
 
 %{\sc TES: In the following, I dont yet feel confident about my $>$'s and my
 %$\geq$'s.  ... conflicting truth values are mapped to U, but in the
@@ -135,78 +134,8 @@ false; $r:n$ is \ourU{} for $0.5 \leq n \leq 0.6$.
 
 %----------------------------------------------------------------
 
-Given Definition~\ref{def:satisfiable}, the definition of the
-reduction of a program is the same as for normal logic progams.
-
-\begin{definition}[Reduction of $\cP$ modulo $\cI$] \label{def:reduction}
-%                                                                                
-Let $\cI$ be an interpretation and $\cP$ a program, both over the same
-langage $\cL$.  By the {\em reduction of $P$ modulo $\cI$} we mean a
-new program $\frac{P}{\cI}$ obtained from $P$ by performing the
-following operations:
-\begin{enumerate}
-\item Remove from $\cP$ all rules that contain a literal that is false
-  in $\cI$.
-\item Remove from all the remaining rules those literals that are true
-  in $\cI$
-\end{enumerate}
-\end{definition}
-
-TES: not sure this def is necessary.
-
-\begin{definition}[Unfounded Sets]
-Given a program $\cP$, there is a dependency edge from an objective
-literal $O_1$ to an objective literal $O_2$ if there is a rule $R \in
-\cP$ such that $O_1$ is the head of $R$ and $O_2$ occurs in a literal
-$L$ in the body of $R$.  If $O_2$ occurs in a positive default literal
-the edge is positive; if $O_2$ occurs in a negative default literal
-the edge is negative.
-
-There is a path between objective literals $O_1$ and $O_2$ in $\cP$ if
-there is an edge bwtween $O_1$ and $O_2$ in $\cP$, or if there is a
-path between $O_1$ and an objective literal $O_3$ and there is an edge
-between $O_3$ and $O_2$.
-
-The direct dependencies of an objective literal $\cO$ are those
-literals to which $\cO$ has a dependency edge.  
-%The dependencies of $\cO$ are those literals to which there is a path
-from $\cO$.
-
-An objective literal $O$ is involved in a negative loop if there is a
-path from $O$ to itself that involves a negative edge.
-
-An objective literal $O$ is {\em unfounded} if $O$ is involved in a
-negative loop and every direct dependency of $O$ is involved in a
-negative loop; or if every rule with head $O$ has a non-empty body,
-and every direct dependency of $O$ is unfounded.
-
-Given a program $\cP$ and interpretation $\cI$, the {\em unfounded
-  set} $\cU_{\cI}$ consists of all unfounded objective literals in
-$\frac{\cP}{\cI}$.
-
-\end{definition}
-
-Unfounded sets will be used to separate the truth values of
-conjugates.  If the semantics is equivalent to rewriting each rule $r$
-for $p$ so that $\naf conjugate(p)$ is in the body of $r$ then a
-program like
-
-\begin{verbatim} 
-p.
-neg p :- not neg p.
-\end{verbatim}
-
-\noindent
-will be able to derive neither p nor neg p.
-
-%I believe that this is what is done in WFSX, but this seems a bit
-%weaker than necessary.  Essentially, we can conclude an objective
-%literal if we know that its conjugate is essentially undefined (as
-%below).  And we can determine this easily enough if its conjugate has
-%been completely evaluated and yet is still undefined.
-
 %----------------------------------------------------------------                 
-\subsection{Well-Founded Model}
+\subsubsection{Well-Founded Model}
 
 Motivation: consider the program
 \begin{verbatim}
@@ -219,10 +148,10 @@ However, if the rule {\tt p:0.8:- not p:0.8.} were removed, p:0.6
 would be false.
 
 \comment{
-For two interpretations, $\cI$ and $\cJ$, $\cI
-\subseteq \cJ$ iff $true(\cI) \subseteq true(\cJ)$ and $false(\cI)
-\subseteq false(\cJ)$.  Alternatively, a three-value interpretation
-can be represented as a set of literals.
+%For two interpretations, $\cI$ and $\cJ$, $\cI
+%\subseteq \cJ$ iff $true(\cI) \subseteq true(\cJ)$ and $false(\cI)
+%%\subseteq false(\cJ)$.  Alternatively, a three-value interpretation
+%can be represented as a set of literals.
 
 A program $P$ is {\em safe} if each rule $r$ in $P$ is such that every
 variable in $r$ occurs in a positive literal in the body of $r$.  
@@ -249,42 +178,60 @@ denoted as $\cB_{\cL}$ or as $\cB_P$.  Throughout the paper variant
 terms are considered to be equal.
 }
 
-\subsubsection{Dynamic Stratification} \label{dyn-strat}
-
 One of the most important formulations of stratification is that of
-{\em dynamic} stratification.  \cite{Przy89d} shows that a program has
-a 2-valued well-founded model iff it is dynamically stratified, so
-that it is the weakest notion of stratification that is consistent
-with the well-founded semantics.
+{\em dynamic} stratification \cite{Przy89d}, which shows that a
+program has a 2-valued well-founded model iff it is dynamically
+stratified, so that it is the weakest notion of stratification
+consistent with the well-founded semantics.  The original definition
+of dynamic stratification included neither explicit negation (neg) nor
+annotations; however the encapsulation of these features within the
+interpretations of Definition~\ref{def:satisfiable} allows the
+definitions in this section to be mostly unchanged from their original
+formulation.
+
 %
 As presented in~\cite{Przy89d}, dynamic stratification computes strata
-via operators on interpretations of the form $\langle Tr;Fa \rangle$,
-where $Tr$ and $Fa$ are subsets of $\cH_P$.
-%
+via operators on interpretations of the form ($\cT$,$\cF$) where $\cT$
+and $\cF$ are subsets of $\cH_P$.  Given a set $\cS$ of ground
+objective literals, a ground objective literal $A:m \hat{\in} \cS$ if
+$A:n \in \cS$ with $n \geq m$.
 
-Given a set $\cS$ of ground objective literals, a ground objective
-literal $A:m \hat{\in} \cS$ if $A:n \in \cS$ with $n \geq m$.
+%-----------------------------------------------------------------------
+Dynamic stratification is based on a series of reduction of a program
+in the usual manner.
 
+\begin{definition}[Reduction of $\cP$ modulo $\cI$] \label{def:reduction}
+%                                                                                
+Let $\cI$ be an interpretation and $\cP$ a program, both over the same
+langage $\cL$.  By the {\em reduction of $P$ modulo $\cI$} we mean a
+new program $\frac{P}{\cI}$ obtained from $P$ by performing the
+following operations:
+\begin{enumerate}
+\item Remove from $\cP$ all rules that contain a literal that is false
+  in $\cI$.
+\item Remove from all the remaining rules those literals that are true
+  in $\cI$
+\end{enumerate}
+\end{definition}
 
-??? are rules defined properly???
+Each stratum is then based on the intepretation of the previous
+stratum if it exists commbined with a reduction.
 
 %-----------------------------------------------------------------------
 \begin{definition} \label{def:dyn-ops}
-For a normal program $P$, sets $Tr$ and $Fa$ of ground atoms and a
+For a normal program $P$, sets $\cT$ and $\cF$ of ground atoms and a
 3-valued interpretation $I = (\cT,\cF)$ (sometimes called a pre-interpretation):
-\begin{description} \item[$True^P_I(Tr) =$]
-    $\{A|A$ is not true in $I$;  and 
-                        there is a clause
-                        $B \leftarrow L_1,...,L_n$
-                in $P$, a grounding substitution $\theta$ such that
-                $A = B\theta$ and for every $1 \leq i \leq n$ either
-                $L_i\theta$ is true in $I$, or $L_i\theta \in Tr$\};
-  \item[$False^P_I(Fa) =$] 
+\begin{description} \item[$True^P_I(\cT) =$]
+    $\{A|A$ is true in $I$; or there is a clause $B \leftarrow
+  L_1,...,L_n$ in $P$, a grounding substitution $\theta$ such that $A
+  = B\theta$ and for every $1 \leq i \leq n$ either $L_i\theta$ is
+  true in $I$, or $L_i\theta \hat{\in} \cT$\};
+  \item[$False^P_I(\cF) =$] 
 %$\{A : val_I(A) \neq {\tt f}$ 
-$\{A|A$ is not false in $I$; and for every
-    clause $B \leftarrow L_1,...,L_n$ in $P$ and grounding substitution
-    $\theta$ such that $A = B\theta$ there is some $i$ $(1 \leq i \leq
-    n)$ such that $L_i\theta$ is false in $I$ or $L_i\theta \in Fa\}$.
+$\{A|A$ is false in $I$; or for every clause $B \leftarrow
+    L_1,...,L_n$ in $P$ and grounding substitution $\theta$ such that
+    $A = B\theta$ there is some $i$ $(1 \leq i \leq n)$ such that
+    $L_i\theta$ is false in $I$ or $L_i\theta \hat{\in} \cF\}$.
 \end{description}
 \end{definition}
 %------------------------------------------------------------------------()     
@@ -306,7 +253,7 @@ by knowing $I$ (via the uncovering of unfounded sets).  An iterated
 fixed point operator builds up dynamic strata by constructing
 successive partial interpretations as follows.
 %----------------------------------------------------------------------          
-\begin{definition}[Iterated Fixed Point and Dynamic Strata]
+\begin{definition}[Iterated Fixed Point and Dynamic Strata] \label{def:wfm}
 \label{def:IFP}
 For a normal program $P$ let 
 
@@ -340,11 +287,19 @@ $WFM(P)$ is in fact the well-founded model and that any undefined
 atoms of the well-founded model do not belong to any stratum --
 i.e. they are not added to $WFM_{\delta}$ for any ordinal
 $\delta$. Thus, a program is \emph{dynamically stratified} if every
-atom belongs to a stratum.
+atom belongs to at least one stratum.
+
+This section has considered normal logic programs extended both with
+explicit negation.  We note that if all atoms in a program $\cP$ have
+the annotation 1, Definition~\ref{def:wfm} reduces to the definition
+of the Well0founded Semantics with Explicit Negation~\cite{AlDP95},
+and if $\cP$ also does not contain explicit negation, the definition
+reduces to the definition of Well-Founded Semantics in \cite{Przy89d}.
 
 %------------------------------------------------------------------------
 % taking out fixed-order stuff until we put LPADs in (though maybe we
 % wont even need it then )
 
 %\input{fixed-order-dynstrat}
+
 
