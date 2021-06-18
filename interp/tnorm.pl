@@ -47,6 +47,7 @@ para_t(A~M):- !,
 :- table para_t_1(_,lattice(join(X,Y,Z))).
 para_t_1(A,M):- 
 	  if(A,B),
+          meta_debug(calling(para_t_1_c1(A,M))),
 	  get_rule_weight(B,Body,Weight),
           meta_debug(calling(if(A,Body))),
           get_top(Top),
@@ -61,13 +62,13 @@ para_t_1(A,M):-
 	     sk_not(meta_t(Compl~_)),M = M_1),
           meta_debug(succeeded(if(A,Body,M))).
 para_t_1(A,M):- 
-        meta_debug(calling(para_t_1(A,M))),
+        meta_debug(calling(para_t_1_c2(A,M))),
 	A~M_fact,
            get_top(Top),
 	   get_complement(A~Top,Compl,_M_c),
 	(  meta_t(Compl~M_c),
 	   get_complement(Compl~M_c,_,M_c_c),
-	   (lt(M_c_c,M_fact) -> M is M_c_c ; M_fact = M)
+	   (lt(M_c_c,M_fact) -> M = M_c_c ; M_fact = M)
 %	   (1-M_c < M_fact -> M is 1-M_c ; M_fact = M)
          ; 
 	   sk_not(meta_t(Compl~_)),M_fact = M),
@@ -131,7 +132,8 @@ meta_t(','(A,B),M_in,M_out):- !,
 	meta_t(B,M_mid,M_out).
 % Assuming input is ground.  Can expand later
 meta_t(naf(A~M),M_in,M_in):- !,
-     sk_not(meta_tu(A~M)).
+%     sk_not(meta_tu(A~M)).
+     sk_not(meta_t(A~M)).
 %meta_t(neg(A),M_in,M_out):- !,
 %	meta_debug(calling(meta(neg(A),M_in,M_out))),
 %	meta(CallTerm),
@@ -143,60 +145,6 @@ meta_t(A,M_in,M_out):-
         (is_quant(A,CallTerm) -> 
 	   meta_debug(calling(A,M_in,M_out)),
 	   meta_t(CallTerm),
-	   CallTerm = _~M_mid
-%	   M_c is 1 - M_mid,
-%	   sk_not(meta(neg(A)~M_c))
-	 ; call(A),get_top(M_mid)),
-	meet(M_in,M_mid,M_out).
-	
-%-------------------------------------------------------
-% Succeeds if A is true or undefined at weight M.
-
-meta_tu(A~M):- !,
-	    meta_debug(calling(meta_tu(A~M))),
-	    (var(M) -> 
-	      meta_1_tu(A,M)
-	    ; meta_1_tu(A,M1),
-	      % meet(M,M1,M) (wont work due to Prolog problems)
-	      gte(M1,M)). 
-
-:- table meta_1_tu(_,lattice(join(X,Y,Z))).
-meta_1_tu(A,M):- 
-	  if(A,B),
-	  get_rule_weight(B,Body,Weight),
-          meta_debug(calling(if(A,Body))),
-          get_top(Top),
-	  meta_tu(Body,Top,M_b),
-          meta_debug(succeeded(if(A,Body,M_b))),
-	  apply_rule_weight(Weight,M_b,M),
-	  get_complement(A~M,Compl,M_c),
-	  sk_not(meta_tu(Compl~M_c)),
-	  meta_debug(succeeded(meta_1_tu(A,M))).
-meta_1_tu(A,M):- 
-        meta_debug(calling(meta_1_tu(A,M))),
-	A~M,
-        get_complement(A~M,Compl,M_c),
-	sk_not(meta_tu(Compl~M_c)),
-        meta_debug(succeeded(meta_1_tu(A,M))).
-
-meta_tu(','(A,B),M_in,M_out):- !,
-	meta_debug(calling(meta3(A))),
-	meta_tu(A,M_in,M_mid),
-	meta_debug(calling(meta3(B))),
-	meta_tu(B,M_mid,M_out).
-meta_tu(naf(A~M),M_in,M_in):- !,
-     sk_not(meta_t(A~M)).
-%meta_t(neg(A),M_in,M_out):- !,
-%	meta_debug(calling(meta(neg(A),M_in,M_out))),
-%	meta(CallTerm),
-%	CallTerm = _~M_mid,
-%	meet(M_in,M_mid,M_out).
-%	   M_c is 1 - M_mid,
-%	   sk_not(meta(A~M_c))
-meta_tu(A,M_in,M_out):- 
-        (is_quant(A,CallTerm) -> 
-	   meta_debug(calling(A,M_in,M_out)),
-	   meta_tu(CallTerm),
 	   CallTerm = _~M_mid
 %	   M_c is 1 - M_mid,
 %	   sk_not(meta(neg(A)~M_c))
@@ -233,7 +181,7 @@ is_quant(A,A~_M):- if(A,_),!.
 
 apply_rule_weight(none,M_b,M_b).
 apply_rule_weight(boost(B),M_b,M):- M is min(1,M_b + M_b*B).
-apply_rule_weight(abs(M),_M_b,M).
+apply_rule_weight(fixed(M),_M_b,M).
 apply_rule_weight(meet(B),M_b,M):- meet(B,M_b,M).
 apply_rule_weight(logistic,M_b,M):- M is 1 / (1 + e**(-(12*M_b-6))).
 
@@ -260,7 +208,6 @@ meet(A,B,C):-
 minmax_meet([MinA,MaxA],[MinB,MaxB],[MinC,MaxC]):- 
     ((0 > MinA + MinB - 1) -> MinC = 0 ; MinC is MinA+MinB-1),
     (MaxA > MaxB -> MaxC=MaxB ; MaxC=MaxA).
-
 
 join(A,B,C):- 
      (current_tnorm(fuzzy) -> (A > B -> C=A ; C=B)
@@ -376,3 +323,59 @@ call_t_complement(A,0):-
    get_complement(A~1,Compl,_M_c),
    \+ get_residual(meta_1_t(Compl,_),[]).
 
+end_of_file.
+
+		  %-------------------------------------------------------
+% Succeeds if A is true or undefined at weight M.
+
+meta_tu(A~M):- !,
+	    meta_debug(calling(meta_tu(A~M))),
+	    (var(M) -> 
+	      meta_1_tu(A,M)
+	    ; meta_1_tu(A,M1),
+	      % meet(M,M1,M) (wont work due to Prolog problems)
+	      gte(M1,M)). 
+
+:- table meta_1_tu(_,lattice(join(X,Y,Z))).
+meta_1_tu(A,M):- 
+	  if(A,B),
+	  get_rule_weight(B,Body,Weight),
+          meta_debug(calling(if(A,Body))),
+          get_top(Top),
+	  meta_tu(Body,Top,M_b),
+          meta_debug(succeeded(if(A,Body,M_b))),
+	  apply_rule_weight(Weight,M_b,M),
+	  get_complement(A~M,Compl,M_c),
+	  sk_not(meta_tu(Compl~M_c)),
+	  meta_debug(succeeded(meta_1_tu(A,M))).
+meta_1_tu(A,M):- 
+        meta_debug(calling(meta_1_tu(A,M))),
+	A~M,
+        get_complement(A~M,Compl,M_c),
+	sk_not(meta_tu(Compl~M_c)),
+        meta_debug(succeeded(meta_1_tu(A,M))).
+
+meta_tu(','(A,B),M_in,M_out):- !,
+	meta_debug(calling(meta3(A))),
+	meta_tu(A,M_in,M_mid),
+	meta_debug(calling(meta3(B))),
+	meta_tu(B,M_mid,M_out).
+meta_tu(naf(A~M),M_in,M_in):- !,
+     sk_not(meta_t(A~M)).
+%meta_t(neg(A),M_in,M_out):- !,
+%	meta_debug(calling(meta(neg(A),M_in,M_out))),
+%	meta(CallTerm),
+%	CallTerm = _~M_mid,
+%	meet(M_in,M_mid,M_out).
+%	   M_c is 1 - M_mid,
+%	   sk_not(meta(A~M_c))
+meta_tu(A,M_in,M_out):- 
+        (is_quant(A,CallTerm) -> 
+	   meta_debug(calling(A,M_in,M_out)),
+	   meta_tu(CallTerm),
+	   CallTerm = _~M_mid
+%	   M_c is 1 - M_mid,
+%	   sk_not(meta(neg(A)~M_c))
+	 ; call(A),get_top(M_mid)),
+	meet(M_in,M_mid,M_out).
+	
