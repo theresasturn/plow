@@ -1,3 +1,4 @@
+
 ?- abolish_all_tables.
 
 test(X):- test(X,_).
@@ -5,6 +6,7 @@ test(X):- test(X,_).
 test(Lit,_):- 
 %  meta(Lit),
   para_t(Lit),
+%  pc_true(Lit),
   fail.
 test(Lit,Resid):- 
   Lit = A~W,
@@ -85,6 +87,11 @@ pc_2 if pc_1a.
 pc_3 if pc_1b.
 pc_3~0.7.
 
+pc_4~0.5.
+neg(pc_4)~0.5.
+
+    
+
 d_c_1 if pc_1a.
 d_c_1 if pc_1b.
 
@@ -98,6 +105,9 @@ neg(cyc_c)~0.6.
 
 cyc_b if cyc_c.
 cyc_b~0.5.
+
+neg(cyc_b_1) if neg(cyc_c).
+cyc_b_1~0.5.
 
 %-------------
 
@@ -141,11 +151,12 @@ test_fuzzy_para:- test(pc_1a~X),(equal_at_precision(X,0.3,3) -> true ; abort(err
 test_fuzzy_para:- test(pc_2~X),(equal_at_precision(X,0.3,3) -> true ; abort(error_fuzzy_para(pc_2~X))),fail.
 test_fuzzy_para:- test(pc_3~X),(equal_at_precision(X,0.7,3) -> true ; abort(error_fuzzy_para(pc_3~X))),fail.
 test_fuzzy_para:- test(rec_boost_c~X),(equal_at_precision(X,0.8,3) -> true ; abort(error_fzy_p(rec_boost_c~X))),fail.
-test_fuzzy_para:- test(cyc_a~X),(equal_at_precision(X,0.4,3) -> true ; abort(error_fuzzy_para(cyc_a~X))),fail.
 test_fuzzy_para:- test(cyc_b~X),(equal_at_precision(X,0.5,3) -> true ; abort(error_fuzzy_para(cyc_b~X))),fail.
+test_fuzzy_para:- test(cyc_b_1~X),(equal_at_precision(X,0.4,3) -> true ; abort(error_fuzzy_para(cyc_b_1~X))),fail.
+test_fuzzy_para:- test(cyc_c~X),(equal_at_precision(X,0.4,3) -> true ; abort(error_fuzzy_para(cyc_c~X))),fail.
 test_fuzzy_para:- test(nn_t~X,[]),(equal_at_precision(X,1,3) -> true ; abort(error_fuzzy_para(nn_t~X))),fail.
-test_fuzzy_para:- test(nn_u~X,Resid),Resid \== [],(kinda_equal(X,1) -> true ; abort(error_fuzzy_para(nn_f~X))),fail.
-test_fuzzy_para:- test(nn_f~X,_), abort(error_fuzzy_para(nn_f~X)),fail.
+test_fuzzy_para:- test(nn_u~X,Resid),Resid \== [],(kinda_equal(X,1) -> true ; abort(error_fuzzy_para(nn_u~X))),fail.
+test_fuzzy_para:- test(nn_f~X,Resid),Resid \== [], (kinda_equal(X,1) -> true ; abort(error_fuzzy_para(nn_f~X))),fail.
 test_fuzzy_para.
 
 kinda_equal(X,Y):- equal_at_precision(X,Y,3).

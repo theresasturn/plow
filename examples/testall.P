@@ -1,0 +1,16 @@
+
+:- ensure_loaded('../interp/tnorm').
+
+testall:-
+    tell('plowtest_new'),
+    fail.
+testall:-
+    [general_tests],
+    test,
+    fail.
+testall:- 
+    [minmax_tests],
+    test_minmax,
+    fail.
+testall:-
+    told.
